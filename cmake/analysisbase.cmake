@@ -11,7 +11,8 @@ find_package( ROOT REQUIRED COMPONENTS Core Imt RIO Net Hist Graf Graf3d Gpad RO
 find_library( ROOT_TREEPLAYER_LIBRARY TreePlayer HINTS ${ROOT_LIBRARY_DIR} REQUIRED )
 find_library( ROOT_RVECOPS_LIBRARY ROOTVecOps HINTS ${ROOT_LIBRARY_DIR} REQUIRED )
 
-set(ANA_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/ana/include/)
+set(ANALOGICAL_SOURCE_DIR  ${CMAKE_SOURCE_DIR}/analogical/)
+set(ANALOGICAL_INCLUDE_DIR ${ANALOGICAL_SOURCE_DIR}/include/)
 
 atlas_add_root_dictionary( 
   AnalysisPlugins AnalysisPluginsDictInput
@@ -22,7 +23,7 @@ atlas_add_root_dictionary(
 atlas_add_library( 
   AnalysisPlugins AnalysisPlugins/*.h Root/*.cxx ${AnalysisPluginsDictInput}
   PUBLIC_HEADERS AnalysisPlugins
-  PRIVATE_INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/ana/include/
+  PRIVATE_INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} ${ANALOGICAL_INCLUDE_DIR}
   PRIVATE_LINK_LIBRARIES ${ROOT_LIBRARIES}
   LINK_LIBRARIES
   xAODBase
@@ -40,13 +41,13 @@ atlas_add_library(
 
 atlas_add_executable( 
   tree_example examples/tree_example.cxx 
-  INCLUDE_DIRS ${ROOT_INCLUDE_DIR} ${ROOT_LIBRARY_DIR} ${ANA_INCLUDE_DIR}
+  INCLUDE_DIRS ${ROOT_INCLUDE_DIR} ${ROOT_LIBRARY_DIR} ${ANALOGICAL_INCLUDE_DIR}
   LINK_LIBRARIES AnalysisPlugins ${ROOT_LIBRARIES}
 )
 
 atlas_add_executable( 
   phys_example examples/phys_example.cxx 
-  INCLUDE_DIRS ${ROOT_INCLUDE_DIR} ${ROOT_LIBRARY_DIR} ${ANA_INCLUDE_DIR}
+  INCLUDE_DIRS ${ROOT_INCLUDE_DIR} ${ROOT_LIBRARY_DIR} ${ANALOGICAL_INCLUDE_DIR}
   LINK_LIBRARIES AnalysisPlugins ${ROOT_LIBRARIES} xAODEventInfo xAODMuon
 )
 

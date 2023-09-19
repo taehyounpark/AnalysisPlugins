@@ -30,11 +30,11 @@ using weight = ana::selection::weight;
 
 int main() {
 
-  auto df = ana::dataflow<Event>({
-    "/cvmfs/atlas-nightlies.cern.ch/repo/data/data-art/ASG/DAOD_PHYS/p5169/mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.deriv.DAOD_PHYS.e6337_s3681_r13167_p5169/DAOD_PHYS.29445530._000001.pool.root.1",
-  },"CollectionTree");
-  auto allMuons = df.read<xAOD::MuonContainer>("Muons");
+  auto df = ana::dataflow<Event>(
+    {"/cvmfs/atlas-nightlies.cern.ch/repo/data/data-art/ASG/DAOD_PHYS/p5169/mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.deriv.DAOD_PHYS.e6337_s3681_r13167_p5169/DAOD_PHYS.29445530._000001.pool.root.1"},
+    "CollectionTree");
   auto eventInfo = df.read<xAOD::EventInfo>("EventInfo");
+  auto allMuons = df.read<xAOD::MuonContainer>("Muons");
 
   class MuonSelection : public ana::column::definition<ConstDataVector<xAOD::MuonContainer>(xAOD::MuonContainer)>
   {
