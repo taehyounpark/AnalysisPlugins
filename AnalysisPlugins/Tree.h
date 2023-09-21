@@ -189,7 +189,7 @@ private:
     }
 
     template <std::size_t I, typename T>
-    void fillColumn(const ana::observable<T>& column) {
+    void fillBranch(const ana::observable<T>& column) {
         std::get<I>(m_columns) = column.value();
     }
 
@@ -200,8 +200,8 @@ private:
     }
 
     template <std::size_t... Is, typename... Observables>
-    void fillColumns(std::index_sequence<Is...>, Observables... columns) {
-        (fillColumn<Is>(columns), ...);
+    void fillBranchs(std::index_sequence<Is...>, Observables... columns) {
+        (fillBranch<Is>(columns), ...);
     }
 
 protected:
@@ -229,7 +229,7 @@ Tree::Snapshot<ColumnTypes...>::Snapshot(const std::string& treeName, Names cons
 template <typename... ColumnTypes>
 void Tree::Snapshot<ColumnTypes...>::fill(ana::observable<ColumnTypes>... columns, double) 
 {
-	this->fillColumns(std::index_sequence_for<ColumnTypes...>(), columns...);
+	this->fillBranchs(std::index_sequence_for<ColumnTypes...>(), columns...);
 	m_snapshot->Fill();
 }
 
