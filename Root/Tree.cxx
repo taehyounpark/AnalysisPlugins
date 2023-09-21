@@ -6,8 +6,8 @@
 #include "TTreeReaderArray.h"
 
 Tree::Tree(const std::vector<std::string>& allFiles, const std::string& treeName) :
-	m_treeName(treeName),
-	m_allFiles(allFiles)
+	m_allFiles(allFiles),
+	m_treeName(treeName)
 {}
 
 ana::dataset::partition Tree::allocate()

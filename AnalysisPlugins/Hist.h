@@ -9,7 +9,7 @@
 #include "TH3.h"
 #include <ROOT/RVec.hxx>
 
-#include "ana/analysis.h"
+#include "ana/analogical.h"
 
 template <int Dim, typename Prec>
 class Hist;

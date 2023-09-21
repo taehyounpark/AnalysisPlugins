@@ -13,7 +13,7 @@
 #include "TVector2.h"
 #include "TH1F.h"
 
-#include "ana/analysis.h"
+#include "ana/analogical.h"
 
 #include "AnalysisPlugins/Tree.h"
 #include "AnalysisPlugins/Hist.h"
@@ -48,13 +48,15 @@ protected:
  
 int main() {
 
+  ana::multithread::disable();
+
   ana::dataflow<Tree> df( {"hww.root"}, "mini" );
 
   auto mc_weight = df.read<float>("mcWeight");
   auto mu_sf = df.read<float>("scaleFactor_MUON");
 
-  // auto el_sf = df.read<float>("scaleFactor_ELE");
-  auto el_sf = df.read<float>("scaleFactor_ELE").vary("sf_var","scaleFactor_PILEUP");
+  auto el_sf = df.read<float>("scaleFactor_ELE");
+  // auto el_sf = df.read<float>("scaleFactor_ELE").vary("sf_var","scaleFactor_PILEUP");
 
   auto lep_pt_MeV = df.read<VecF>("lep_pt");
   auto lep_eta = df.read<VecF>("lep_eta");
@@ -127,16 +129,23 @@ int main() {
   // // ana::output::dump<Folder>(pth_hists, *out_file, "ggf");
   // // delete out_file;
 
-  auto mll_vars_2los = df.book<Hist<1,float>>("mll",50,0,100).fill(mll).at(cut_2los);
-  auto mll_nom_2los = mll_vars_2los.nominal();
-  auto mll_var_2los = mll_vars_2los["lp4_up"];
-  mll_nom_2los->SetLineColor(kBlack); mll_nom_2los->Draw("hist");
-  mll_var_2los->SetLineColor(kRed); mll_var_2los->Draw("E same");
-  gPad->Print("mll_varied_2los.pdf");
 
-  auto mll_vars_channels = df.book<Hist<1,float>>("mll",50,0,200).fill(mll).at(cut_2ldf, cut_2lsf);
-  std::cout << mll_vars_channels.nominal()["2ldf"]->GetMean() << std::endl;
-  std::cout << mll_vars_channels["lp4_up"]["2lsf"]->GetMean() << std::endl;
+  // auto mll_vars_2los = df.book<Hist<1,float>>("mll",50,0,100).fill(mll).at(cut_2los);
+  // auto mll_nom_2los = mll_vars_2los.nominal();
+  // auto mll_var_2los = mll_vars_2los["lp4_up"];
+  // mll_nom_2los->SetLineColor(kBlack); mll_nom_2los->Draw("hist");
+  // mll_var_2los->SetLineColor(kRed); mll_var_2los->Draw("E same");
+  // gPad->Print("mll_varied_2los.pdf");
+
+  // auto mll_vars_channels = df.book<Hist<1,float>>("mll",50,0,200).fill(mll).at(cut_2ldf, cut_2lsf);
+  // std::cout << mll_vars_channels.nominal()["2ldf"]->GetMean() << std::endl;
+  // std::cout << mll_vars_channels["lp4_up"]["2lsf"]->GetMean() << std::endl;
+
+  auto miniTree = df.book<Tree::Snapshot<VecD,float,float>>("miniTree","lep_pt_sel","mll","eventWeight").fill(lep_pt_sel,mll,incl).at(cut_2ldf);
+  // auto miniTree = df.book<Tree::Snapshot<VecD>>("miniTree","lep_pt_sel").fill(lep_pt_sel).at(cut_2ldf);
+  auto outputFile = new TFile("analyzed.root","recreate");
+  outputFile->WriteObject(miniTree.nominal().result().get(),miniTree.nominal()->GetName());
+  delete outputFile;
 
   return 0;
 }

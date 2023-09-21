@@ -8,7 +8,7 @@
 #include <ROOT/RVec.hxx>
 #include <ROOT/RDataSource.hxx>
 
-#include "ana/analysis.h"
+#include "ana/analogical.h"
 
 class RDS : public ana::dataset::input<RDS>
 {

@@ -12,7 +12,7 @@
 #include "TVector2.h"
 #include "TH1F.h"
 
-#include "ana/analysis.h"
+#include "ana/analogical.h"
 
 #include "AnalysisPlugins/Event.h"
 #include "AnalysisPlugins/Hist.h"
