@@ -14,6 +14,14 @@ target_include_directories(AnalysisPlugins PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_compile_features(AnalysisPlugins PUBLIC cxx_std_17)
 
+target_compile_options(
+  AnalysisPlugins PRIVATE 
+  -Wall -Wextra 
+  $<$<CONFIG:Release>:-O3> 
+  $<$<CONFIG:RelWithDebInfo>:-O3> 
+  $<$<CONFIG:Debug>:-O0> $<$<CONFIG:Debug>:-ggdb3> 
+)
+
 find_package(ROOT REQUIRED COMPONENTS Core Imt RIO Net Hist Graf Graf3d Gpad ROOTVecOps Tree TreePlayer Rint Postscript Matrix Physics MathCore Thread MultiProc ROOTDataFrame )
 find_library(ROOT_TREEPLAYER_LIBRARY TreePlayer HINTS ${ROOT_LIBRARY_DIR} REQUIRED)
 find_library(ROOT_RDATAFRAME_LIBRARY ROOTDataFrame HINTS ${ROOT_LIBRARY_DIR} REQUIRED)

@@ -14,8 +14,6 @@
 namespace HistUtils
 {
 
-	size_t getDim(TH1& hist);
-
 	// create the appropriate histogram given the dimensionality and precision of columns.
 	// e.g. makeHist<1,float> -> TH1F
 	template <unsigned int Dim, typename Prec>
@@ -23,6 +21,8 @@ namespace HistUtils
 	{
 		std::shared_ptr<TH1> hist;
 		if constexpr(Dim==1) {
+			(void)ybins;
+			(void)zbins;
 			if constexpr(std::is_same_v<Prec,char> || std::is_same_v<Prec,bool>) {
 				hist = std::shared_ptr<TH1C>(new TH1C("","",xbins.size()-1,&xbins[0]));
 			} else if constexpr(std::is_same_v<Prec,int>) {
@@ -33,6 +33,7 @@ namespace HistUtils
 				hist = std::shared_ptr<TH1D>(new TH1D("","",xbins.size()-1,&xbins[0]));
 			}
 		} else if constexpr(Dim==2) {
+			(void)zbins;
 			if constexpr(std::is_same_v<Prec,char> || std::is_same_v<Prec,bool>) {
 				hist = std::shared_ptr<TH2C>(new TH2C("","",xbins.size()-1,&xbins[0],ybins.size()-1,&ybins[0]));
 			} else if constexpr(std::is_same_v<Prec,int>) {
@@ -64,6 +65,8 @@ namespace HistUtils
 	{
 		std::shared_ptr<TH1> hist = nullptr;
 		if constexpr(Dim==1) {
+			(void)nybins; (void)ymin; (void)ymax;
+			(void)nzbins; (void)zmin; (void)zmax;
 			if constexpr(std::is_same_v<Prec,char> || std::is_same_v<Prec,bool>) {
 				hist = std::shared_ptr<TH1C>(new TH1C("","",nxbins,xmin,xmax));
 			} else if constexpr(std::is_same_v<Prec,int>) {
@@ -74,6 +77,7 @@ namespace HistUtils
 				hist = std::shared_ptr<TH1D>(new TH1D("","",nxbins,xmin,xmax));
 			}
 		} else if constexpr(Dim==2) {
+			(void)nzbins; (void)zmin; (void)zmax;
 			if constexpr(std::is_same_v<Prec,char> || std::is_same_v<Prec,bool>) {
 				hist = std::shared_ptr<TH2C>(new TH2C("","",nxbins,xmin,xmax,nybins,ymin,ymax));
 			} else if constexpr(std::is_same_v<Prec,int>) {
