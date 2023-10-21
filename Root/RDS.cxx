@@ -11,14 +11,14 @@ ana::dataset::partition RDS::allocate() {
 
   // get allocated slots
   auto slots = m_rds->GetEntryRanges();
-  ana::dataset::partition partition;
+  ana::dataset::partition parts;
   for (size_t islot = 0; islot < slots.size(); ++islot) {
-    partition.add_part(islot, slots[islot].first, slots[islot].second);
+    parts.emplace_back(islot, slots[islot].first, slots[islot].second);
   }
 
   // use whatever ROOT has decided
-  partition.fixed = true;
-  return partition;
+  parts.fixed = true;
+  return parts;
 }
 
 void RDS::initialize() { m_rds->Initialise(); }

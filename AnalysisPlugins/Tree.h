@@ -33,7 +33,7 @@ public:
   // Tree(Tree &&) = default;
   // Tree &operator=(Tree &&) = default;
 
-  ana::dataset::partition allocate();
+  virtual ana::dataset::partition allocate() override;
 
   std::unique_ptr<Reader> open(const ana::dataset::range &part);
 
@@ -50,7 +50,7 @@ protected:
   std::vector<std::unique_ptr<TTreeReader>> m_treeReaders; //!
 };
 
-class Tree::Reader : public ana::dataset::row {
+class Tree::Reader : public ana::dataset::player {
 public:
   Reader(TTreeReader &treeReader);
   ~Reader() = default;

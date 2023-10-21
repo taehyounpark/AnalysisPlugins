@@ -43,7 +43,7 @@ ana::dataset::partition Tree::allocate() {
     long long start = 0ll, end = 0ll;
     while ((start = clusterIterator.Next()) < fileEntries) {
       end = clusterIterator.GetNextEntry();
-      parts.add_part(islot++, offset + start, offset + end);
+      parts.emplace_back(islot++, offset + start, offset + end);
     }
     // remember offset for next file
     offset += fileEntries;

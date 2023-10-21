@@ -46,23 +46,24 @@ int main() {
 
   ana::multithread::disable();
 
-  auto df = ana::dataflow(Tree({"hww.root"}, "mini"));
+  ana::dataflow df;
 
-  auto mc_weight = df.read<float>("mcWeight");
-  auto mu_sf = df.read<float>("scaleFactor_MUON");
+  auto ds = df.open<Tree>(std::vector<std::string>{"hww.root"}, "mini");
+  auto mc_weight = ds.read<float>("mcWeight");
+  auto mu_sf = ds.read<float>("scaleFactor_MUON");
 
-  auto el_sf = df.read<float>("scaleFactor_ELE");
+  auto el_sf = ds.read<float>("scaleFactor_ELE");
   // auto el_sf =
-  // df.read<float>("scaleFactor_ELE").vary("sf_var","scaleFactor_PILEUP");
+  // ds.read<float>("scaleFactor_ELE").vary("sf_var","scaleFactor_PILEUP");
 
-  auto lep_pt_MeV = df.read<VecF>("lep_pt");
-  auto lep_eta = df.read<VecF>("lep_eta");
-  auto lep_phi = df.read<VecF>("lep_phi");
-  auto lep_E_MeV = df.read<VecF>("lep_E");
-  auto lep_Q = df.read<VecF>("lep_charge");
-  auto lep_type = df.read<VecUI>("lep_type");
-  auto met_MeV = df.read<float>("met_et");
-  auto met_phi = df.read<float>("met_phi");
+  auto lep_pt_MeV = ds.read<VecF>("lep_pt");
+  auto lep_eta = ds.read<VecF>("lep_eta");
+  auto lep_phi = ds.read<VecF>("lep_phi");
+  auto lep_E_MeV = ds.read<VecF>("lep_E");
+  auto lep_Q = ds.read<VecF>("lep_charge");
+  auto lep_type = ds.read<VecUI>("lep_type");
+  auto met_MeV = ds.read<float>("met_et");
+  auto met_phi = ds.read<float>("met_phi");
 
   auto MeV = df.constant(1000.0);
   auto lep_pt = lep_pt_MeV / MeV;

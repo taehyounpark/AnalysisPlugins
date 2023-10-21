@@ -24,21 +24,21 @@ public:
   RDS(std::unique_ptr<RDataSource> rds);
   ~RDS() = default;
 
-  ana::dataset::partition allocate();
+  virtual ana::dataset::partition allocate() override;
   std::unique_ptr<Reader> open(const ana::dataset::range &part) const;
 
   template <typename T>
   std::unique_ptr<Column<T>> read(const ana::dataset::range &,
                                   const std::string &) const;
 
-  void initialize();
-  void finalize();
+  virtual void initialize() override;
+  virtual void finalize() override;
 
 protected:
   std::unique_ptr<RDataSource> m_rds;
 };
 
-class RDS::Reader : public ana::dataset::row {
+class RDS::Reader : public ana::dataset::player {
 
 public:
   Reader(RDataSource &rds);

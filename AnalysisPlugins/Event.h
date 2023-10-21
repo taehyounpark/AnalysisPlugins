@@ -46,7 +46,7 @@ protected:
   std::vector<std::string> m_goodFiles;
 };
 
-class Event::Loop : public ana::dataset::row {
+class Event::Loop : public ana::dataset::player {
 public:
   Loop(TTree *tree);
   ~Loop() = default;
