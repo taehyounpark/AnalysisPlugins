@@ -4,7 +4,7 @@
 
 RDS::RDS(std::unique_ptr<RDataSource> rds) : m_rds(std::move(rds)) {}
 
-ana::dataset::partition RDS::allocate() {
+ana::dataset::partition RDS::parallelize() {
   // force multithreading
   ROOT::EnableImplicitMT();
   m_rds->SetNSlots(ROOT::GetThreadPoolSize() ? ROOT::GetThreadPoolSize() : 1);

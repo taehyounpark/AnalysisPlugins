@@ -33,7 +33,7 @@ public:
   // Tree(Tree &&) = default;
   // Tree &operator=(Tree &&) = default;
 
-  virtual ana::dataset::partition allocate() override;
+  virtual ana::dataset::partition parallelize() override;
 
   std::unique_ptr<Reader> open(const ana::dataset::range &part);
 
@@ -163,7 +163,7 @@ public:
   virtual void fill(ana::observable<ColumnTypes>..., double) override;
   virtual std::shared_ptr<TTree> result() const override;
   virtual std::shared_ptr<TTree>
-  merge(std::vector<std::shared_ptr<TTree>> results) const override;
+  merge(std::vector<std::shared_ptr<TTree>> const &results) const override;
 
 private:
   // helper function to make branch of i-th data type with i-th column name
@@ -225,7 +225,7 @@ std::shared_ptr<TTree> Tree::Snapshot<ColumnTypes...>::result() const {
 
 template <typename... ColumnTypes>
 std::shared_ptr<TTree> Tree::Snapshot<ColumnTypes...>::merge(
-    std::vector<std::shared_ptr<TTree>> results) const {
+    std::vector<std::shared_ptr<TTree>> const &results) const {
   TList list;
   for (auto const &result : results) {
     list.Add(result.get());

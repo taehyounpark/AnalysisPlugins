@@ -29,7 +29,7 @@ public:
         const std::string &metadata = "MetaData");
   ~Event() = default;
 
-  ana::dataset::partition allocate();
+  ana::dataset::partition parallelize();
   double normalize();
 
   std::unique_ptr<Loop> read(const ana::dataset::range &part) const;

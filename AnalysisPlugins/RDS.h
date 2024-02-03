@@ -24,7 +24,7 @@ public:
   RDS(std::unique_ptr<RDataSource> rds);
   ~RDS() = default;
 
-  virtual ana::dataset::partition allocate() override;
+  virtual ana::dataset::partition parallelize() override;
   std::unique_ptr<Reader> open(const ana::dataset::range &part) const;
 
   template <typename T>

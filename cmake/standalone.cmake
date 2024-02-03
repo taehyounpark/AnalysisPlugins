@@ -49,10 +49,10 @@ install(DIRECTORY
   DESTINATION lib
   )
 
-add_executable(tree_example examples/tree_example.cxx)
-target_compile_features(tree_example PUBLIC cxx_std_17)
-target_include_directories(tree_example PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${ROOT_INCLUDE_DIRS} ${ROOT_LIBRARY_DIR})
-target_link_libraries(tree_example AnalysisPlugins ${ROOT_LIBRARIES})
+# add_executable(tree_example examples/tree_example.cxx)
+# target_compile_features(tree_example PUBLIC cxx_std_17)
+# target_include_directories(tree_example PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${ROOT_INCLUDE_DIRS} ${ROOT_LIBRARY_DIR})
+# target_link_libraries(tree_example AnalysisPlugins ${ROOT_LIBRARIES})
 
 set(SETUP ${CMAKE_CURRENT_BINARY_DIR}/setup.sh)
 file(WRITE ${SETUP} "#!/bin/bash\n")

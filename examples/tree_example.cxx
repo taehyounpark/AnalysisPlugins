@@ -129,18 +129,18 @@ int main() {
   auto cut_2ldf_cr = cut_2ldf.filter("cr")(mll > mll_cut);
   auto cut_2lsf_cr = cut_2lsf.filter("cr")(met > met_cut);
 
-  auto pth_hist = df.book<Hist<1, float>>("pth", 50, 0, 400).fill(pth);
+  auto pth_hist = df.agg<Hist<1, float>>("pth", 50, 0, 400).fill(pth);
   auto pth_2ldf_sr = pth_hist.at(cut_2ldf_sr);
   auto pth_2ldf_cr = pth_hist.at(cut_2ldf_cr);
 
   auto get_pt = df.define([](P4 const &p4) { return p4.Pt(); });
   auto l1pt = get_pt(l1p4);
   auto l2pt = get_pt(l2p4);
-  auto l1n2pt_hists = df.book<Hist<1, float>>(std::string("l1n2pt"), 50, 0, 200)
+  auto l1n2pt_hists = df.agg<Hist<1, float>>(std::string("l1n2pt"), 50, 0, 200)
                           .fill(l1pt)
                           .fill(l2pt)
                           .at(cut_2los, cut_2lsf, cut_2ldf);
-  auto pth_hists = df.book<Hist<1, float>>("pth", 50, 0, 400)
+  auto pth_hists = df.agg<Hist<1, float>>("pth", 50, 0, 400)
                        .fill(pth)
                        .at(cut_2los, cut_2ldf, cut_2lsf);
 
@@ -151,7 +151,7 @@ int main() {
   // // delete out_file;
 
   auto mll_vars_2los =
-      df.book<Hist<1, float>>("mll", 50, 0, 100).fill(mll).at(cut_2los);
+      df.agg<Hist<1, float>>("mll", 50, 0, 100).fill(mll).at(cut_2los);
   auto mll_nom_2los = mll_vars_2los.nominal();
   auto mll_var_2los = mll_vars_2los["lp4_up"];
   mll_nom_2los->SetLineColor(kBlack);
@@ -160,18 +160,18 @@ int main() {
   mll_var_2los->Draw("hist same");
   gPad->Print("mll_varied_2los.pdf");
 
-  auto mll_vars_channels = df.book<Hist<1, float>>("mll", 50, 0, 200)
+  auto mll_vars_channels = df.agg<Hist<1, float>>("mll", 50, 0, 200)
                                .fill(mll)
                                .at(cut_2ldf, cut_2lsf);
   std::cout << mll_vars_channels.nominal()["2ldf"]->GetMean() << std::endl;
   std::cout << mll_vars_channels["lp4_up"]["2lsf"]->GetMean() << std::endl;
 
-  auto miniTree = df.book<Tree::Snapshot<VecD, float, float>>(
+  auto miniTree = df.agg<Tree::Snapshot<VecD, float, float>>(
                         "miniTree", "lep_pt_sel", "mll", "eventWeight")
                       .fill(lep_pt_sel, mll, incl)
                       .at(cut_2ldf);
   // auto miniTree =
-  // df.book<Tree::Snapshot<VecD>>("miniTree","lep_pt_sel").fill(lep_pt_sel).at(cut_2ldf);
+  // df.agg<Tree::Snapshot<VecD>>("miniTree","lep_pt_sel").fill(lep_pt_sel).at(cut_2ldf);
   auto outputFile = new TFile("analyzed.root", "recreate");
   outputFile->WriteObject(miniTree.nominal().result().get(),
                           miniTree.nominal()->GetName());
