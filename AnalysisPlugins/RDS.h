@@ -54,7 +54,7 @@ protected:
   long long m_current;
 };
 
-template <typename T> class RDS::Column : public ana::dataset::column<T> {
+template <typename T> class RDS::Column : public ana::dataset::reader<T> {
 
 public:
   Column(T **cursor) : m_cursor(cursor) {}

@@ -21,9 +21,9 @@ ana::dataset::partition RDS::parallelize() {
   return parts;
 }
 
-void RDS::initialize() { m_rds->Initialise(); }
+void RDS::initialize() { m_rds->Initialize(); }
 
-void RDS::finalize() { m_rds->Finalise(); }
+void RDS::finalize() { m_rds->Finalize(); }
 
 std::unique_ptr<RDS::Reader> RDS::open(const ana::dataset::range &) const {
   return std::make_unique<Reader>(*m_rds);
@@ -41,5 +41,5 @@ void RDS::Reader::execute(const ana::dataset::range &part,
 }
 
 void RDS::Reader::finalize(const ana::dataset::range &part) {
-  m_rds->FinaliseSlot(part.slot);
+  m_rds->FinalizeSlot(part.slot);
 }

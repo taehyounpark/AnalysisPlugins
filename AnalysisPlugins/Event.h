@@ -62,7 +62,7 @@ protected:
   long long m_end;
 };
 
-template <typename T> class Event::Container : public ana::dataset::column<T> {
+template <typename T> class Event::Container : public ana::dataset::reader<T> {
 
 public:
   Container(const std::string &containerName, xAOD::TEvent &event)

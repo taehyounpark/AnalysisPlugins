@@ -64,7 +64,7 @@ protected:
   TTreeReader *const m_treeReader;
 };
 
-template <typename T> class Tree::Branch : public ana::dataset::column<T> {
+template <typename T> class Tree::Branch : public ana::dataset::reader<T> {
 
 public:
   Branch(const std::string &branchName, TTreeReader &treeReader)
@@ -85,7 +85,7 @@ protected:
 };
 
 template <typename T>
-class Tree::Branch<ROOT::RVec<T>> : public ana::dataset::column<ROOT::RVec<T>> {
+class Tree::Branch<ROOT::RVec<T>> : public ana::dataset::reader<ROOT::RVec<T>> {
 
 public:
   Branch(const std::string &branchName, TTreeReader &treeReader)
@@ -117,7 +117,7 @@ protected:
 
 template <>
 class Tree::Branch<ROOT::RVec<bool>>
-    : public ana::dataset::column<ROOT::RVec<bool>> {
+    : public ana::dataset::reader<ROOT::RVec<bool>> {
 
 public:
   Branch(const std::string &branchName, TTreeReader &treeReader)
