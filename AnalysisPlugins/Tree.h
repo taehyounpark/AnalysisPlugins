@@ -17,7 +17,7 @@
 
 #include "ana/analogical.h"
 
-class Tree : public ana::dataset::input<Tree> {
+class Tree : public ana::dataset::source<Tree> {
 
 public:
   class Reader;
@@ -28,6 +28,8 @@ public:
 
 public:
   Tree(const std::vector<std::string> &filePaths, const std::string &treeName);
+  Tree(std::initializer_list<std::string> filePaths,
+       const std::string &treeName);
   // ~Tree() = default;
 
   // Tree(Tree &&) = default;

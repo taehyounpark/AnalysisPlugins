@@ -10,7 +10,7 @@
 
 #include "ana/analogical.h"
 
-class RDS : public ana::dataset::input<RDS> {
+class RDS : public ana::dataset::source<RDS> {
 
 private:
   using RDataSource = ROOT::RDF::RDataSource;

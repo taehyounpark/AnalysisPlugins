@@ -9,6 +9,10 @@ Tree::Tree(const std::vector<std::string> &allFiles,
            const std::string &treeName)
     : m_allFiles(allFiles), m_treeName(treeName) {}
 
+Tree::Tree(std::initializer_list<std::string> allFiles,
+           const std::string &treeName)
+    : m_allFiles(allFiles), m_treeName(treeName) {}
+
 ana::dataset::partition Tree::parallelize() {
   ROOT::EnableThreadSafety();
   ROOT::EnableImplicitMT();

@@ -16,7 +16,7 @@
 
 #include "ana/analogical.h"
 
-class Event : public ana::dataset::input<Event> {
+class Event : public ana::dataset::source<Event> {
 
 public:
   class Loop;
