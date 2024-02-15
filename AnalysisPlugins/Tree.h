@@ -150,7 +150,7 @@ protected:
 
 template <typename... ColumnTypes>
 class Tree::Snapshot
-    : public ana::aggregation::logic<std::shared_ptr<TTree>(ColumnTypes...)> {
+    : public ana::counter::definition<std::shared_ptr<TTree>(ColumnTypes...)> {
 
 public:
   static constexpr size_t N = sizeof...(ColumnTypes);

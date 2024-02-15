@@ -11,6 +11,8 @@
 #pragma link off all classes;
 #pragma link off all globals;
 
+#pragma link C++ class ana::dataflow + ;
+
 #pragma link C++ class ana::multithread + ;
 #pragma link C++ class ana::operation + ;
 
@@ -24,8 +26,8 @@
 #pragma link C++ class ana::selection::weight + ;
 #pragma link C++ class ana::selection::cutflow + ;
 
-#pragma link C++ class ana::aggregation + ;
-#pragma link C++ class ana::aggregation::experiment + ;
+#pragma link C++ class ana::counter + ;
+#pragma link C++ class ana::counter::experiment + ;
 
 #pragma link C++ class Hist < 1, float> + ;
 #pragma link C++ class Hist < 2, float> + ;
@@ -37,11 +39,6 @@
 #pragma link C++ class Tree + ;
 #pragma link C++ class RDS + ;
 #pragma link C++ class Event + ;
-
-#pragma link C++ class ana::dataflow + ;
-
-#pragma link C++ class ana::output + ;
-#pragma link C++ class Folder + ;
 
 #pragma link C++ nestedclass;
 #pragma link C++ nestedtypedef;
