@@ -9,20 +9,20 @@
 #include "TH3.h"
 #include <ROOT/RVec.hxx>
 
-#include "ana/analogical.h"
+#include "queryosity/queryosity.h"
 
 template <int Dim, typename Prec> class Hist;
 
 template <typename Prec>
 class Hist<1, Prec>
-    : public ana::counter::definition<std::shared_ptr<TH1>(Prec)> {
+    : public queryosity::query::definition<std::shared_ptr<TH1>(Prec)> {
 
 public:
   Hist(const std::string &, unsigned int, double, double);
   Hist(const std::string &, const std::vector<double> &);
   virtual ~Hist() = default;
 
-  virtual void fill(ana::observable<Prec>, double) override;
+  virtual void fill(queryosity::column::observable<Prec>, double) override;
   virtual std::shared_ptr<TH1> result() const override;
   virtual std::shared_ptr<TH1>
   merge(std::vector<std::shared_ptr<TH1>> const &results) const override;
@@ -34,15 +34,15 @@ protected:
 
 template <typename Prec>
 class Hist<2, Prec>
-    : public ana::counter::definition<std::shared_ptr<TH2>(Prec, Prec)> {
+    : public queryosity::query::definition<std::shared_ptr<TH2>(Prec, Prec)> {
 
 public:
   Hist(const std::string &, const std::vector<double> &,
        const std::vector<double> &);
   virtual ~Hist() = default;
 
-  virtual void fill(ana::observable<Prec>, ana::observable<Prec>,
-                    double) override;
+  virtual void fill(queryosity::column::observable<Prec>,
+                    queryosity::column::observable<Prec>, double) override;
   virtual std::shared_ptr<TH2> result() const override;
   virtual std::shared_ptr<TH2>
   merge(std::vector<std::shared_ptr<TH2>> const &results) const override;
@@ -52,16 +52,17 @@ protected:
 };
 
 template <typename Prec>
-class Hist<3, Prec>
-    : public ana::counter::definition<std::shared_ptr<TH3>(Prec, Prec, Prec)> {
+class Hist<3, Prec> : public queryosity::query::definition<std::shared_ptr<TH3>(
+                          Prec, Prec, Prec)> {
 
 public:
   Hist(const std::string &, const std::vector<double> &,
        const std::vector<double> &, const std::vector<double> &);
   virtual ~Hist() = default;
 
-  virtual void fill(ana::observable<Prec>, ana::observable<Prec>,
-                    ana::observable<Prec>, double) override;
+  virtual void fill(queryosity::column::observable<Prec>,
+                    queryosity::column::observable<Prec>,
+                    queryosity::column::observable<Prec>, double) override;
   virtual std::shared_ptr<TH3> result() const override;
   virtual std::shared_ptr<TH3>
   merge(std::vector<std::shared_ptr<TH3>> const &results) const override;
@@ -72,14 +73,16 @@ protected:
 
 template <typename Prec>
 class Hist<1, ROOT::RVec<Prec>>
-    : public ana::counter::definition<std::shared_ptr<TH1>(ROOT::RVec<Prec>)> {
+    : public queryosity::query::definition<std::shared_ptr<TH1>(
+          ROOT::RVec<Prec>)> {
 
 public:
   Hist(const std::string &name, unsigned int nbins, double min, double xmax);
   Hist(const std::string &name, const std::vector<double> &xbins);
   virtual ~Hist() = default;
 
-  virtual void fill(ana::observable<ROOT::RVec<Prec>>, double) override;
+  virtual void fill(queryosity::column::observable<ROOT::RVec<Prec>>,
+                    double) override;
   virtual std::shared_ptr<TH1> result() const override;
   virtual std::shared_ptr<TH1>
   merge(std::vector<std::shared_ptr<TH1>> const &results) const override;
@@ -91,16 +94,17 @@ protected:
 
 template <typename Prec>
 class Hist<2, ROOT::RVec<Prec>>
-    : public ana::counter::definition<std::shared_ptr<TH2>(ROOT::RVec<Prec>,
-                                                           ROOT::RVec<Prec>)> {
+    : public queryosity::query::definition<std::shared_ptr<TH2>(
+          ROOT::RVec<Prec>, ROOT::RVec<Prec>)> {
 
 public:
   Hist(const std::string &, const std::vector<double> &,
        const std::vector<double> &);
   virtual ~Hist() = default;
 
-  virtual void fill(ana::observable<ROOT::RVec<Prec>>,
-                    ana::observable<ROOT::RVec<Prec>>, double) override;
+  virtual void fill(queryosity::column::observable<ROOT::RVec<Prec>>,
+                    queryosity::column::observable<ROOT::RVec<Prec>>,
+                    double) override;
   virtual std::shared_ptr<TH2> result() const override;
   virtual std::shared_ptr<TH2>
   merge(std::vector<std::shared_ptr<TH2>> const &results) const override;
@@ -112,7 +116,7 @@ protected:
 
 template <typename Prec>
 class Hist<3, ROOT::RVec<Prec>>
-    : public ana::counter::definition<std::shared_ptr<TH3>(
+    : public queryosity::query::definition<std::shared_ptr<TH3>(
           ROOT::RVec<Prec>, ROOT::RVec<Prec>, ROOT::RVec<Prec>)> {
 
 public:
@@ -120,9 +124,10 @@ public:
        const std::vector<double> &, const std::vector<double> &);
   virtual ~Hist() = default;
 
-  virtual void fill(ana::observable<ROOT::RVec<Prec>>,
-                    ana::observable<ROOT::RVec<Prec>>,
-                    ana::observable<ROOT::RVec<Prec>>, double) override;
+  virtual void fill(queryosity::column::observable<ROOT::RVec<Prec>>,
+                    queryosity::column::observable<ROOT::RVec<Prec>>,
+                    queryosity::column::observable<ROOT::RVec<Prec>>,
+                    double) override;
   virtual std::shared_ptr<TH3> result() const override;
   virtual std::shared_ptr<TH3>
   merge(std::vector<std::shared_ptr<TH3>> const &results) const override;
@@ -137,20 +142,20 @@ protected:
 template <typename Prec>
 Hist<1, Prec>::Hist(const std::string &name, unsigned int nbins, double xmin,
                     double xmax)
-    : ana::counter::definition<std::shared_ptr<TH1>(Prec)>() {
+    : queryosity::query::definition<std::shared_ptr<TH1>(Prec)>() {
   m_hist = HistUtils::makeHist<1, Prec>(nbins, xmin, xmax);
   m_hist->SetName(name.c_str());
 }
 
 template <typename Prec>
 Hist<1, Prec>::Hist(const std::string &name, const std::vector<double> &xbins)
-    : ana::counter::definition<std::shared_ptr<TH1>(Prec)>() {
+    : queryosity::query::definition<std::shared_ptr<TH1>(Prec)>() {
   m_hist = HistUtils::makeHist<1, Prec>(xbins);
   m_hist->SetName(name.c_str());
 }
 
 template <typename Prec>
-void Hist<1, Prec>::fill(ana::observable<Prec> x, double w) {
+void Hist<1, Prec>::fill(queryosity::column::observable<Prec> x, double w) {
   m_hist->Fill(x.value(), w);
 }
 
@@ -172,15 +177,15 @@ Hist<1, Prec>::merge(std::vector<std::shared_ptr<TH1>> const &results) const {
 template <typename Prec>
 Hist<2, Prec>::Hist(const std::string &name, const std::vector<double> &xbins,
                     const std::vector<double> &ybins)
-    : ana::counter::definition<std::shared_ptr<TH2>(Prec, Prec)>() {
+    : queryosity::query::definition<std::shared_ptr<TH2>(Prec, Prec)>() {
   m_hist =
       std::static_pointer_cast<TH2>(HistUtils::makeHist<2, Prec>(xbins, ybins));
   m_hist->SetName(name.c_str());
 }
 
 template <typename Prec>
-void Hist<2, Prec>::fill(ana::observable<Prec> x, ana::observable<Prec> y,
-                         double w) {
+void Hist<2, Prec>::fill(queryosity::column::observable<Prec> x,
+                         queryosity::column::observable<Prec> y, double w) {
   m_hist->Fill(x.value(), y.value(), w);
 }
 
@@ -203,15 +208,16 @@ template <typename Prec>
 Hist<3, Prec>::Hist(const std::string &name, const std::vector<double> &xbins,
                     const std::vector<double> &ybins,
                     const std::vector<double> &zbins)
-    : ana::counter::definition<std::shared_ptr<TH3>(Prec, Prec, Prec)>() {
+    : queryosity::query::definition<std::shared_ptr<TH3>(Prec, Prec, Prec)>() {
   m_hist = std::static_pointer_cast<TH3>(
       HistUtils::makeHist<3, Prec>(xbins, ybins, zbins));
   m_hist->SetName(name.c_str());
 }
 
 template <typename Prec>
-void Hist<3, Prec>::fill(ana::observable<Prec> x, ana::observable<Prec> y,
-                         ana::observable<Prec> z, double w) {
+void Hist<3, Prec>::fill(queryosity::column::observable<Prec> x,
+                         queryosity::column::observable<Prec> y,
+                         queryosity::column::observable<Prec> z, double w) {
   m_hist->Fill(x.value(), y.value(), z.value(), w);
 }
 
@@ -235,7 +241,7 @@ template <typename Prec> std::shared_ptr<TH3> Hist<3, Prec>::result() const {
 template <typename Prec>
 Hist<1, ROOT::RVec<Prec>>::Hist(const std::string &name, unsigned int nbins,
                                 double xmin, double xmax)
-    : ana::counter::definition<std::shared_ptr<TH1>(ROOT::RVec<Prec>)>() {
+    : queryosity::query::definition<std::shared_ptr<TH1>(ROOT::RVec<Prec>)>() {
   m_hist = HistUtils::makeHist<1, Prec>(nbins, xmin, xmax);
   m_hist->SetName(name.c_str());
 }
@@ -243,14 +249,14 @@ Hist<1, ROOT::RVec<Prec>>::Hist(const std::string &name, unsigned int nbins,
 template <typename Prec>
 Hist<1, ROOT::RVec<Prec>>::Hist(const std::string &name,
                                 const std::vector<double> &xbins)
-    : ana::counter::definition<std::shared_ptr<TH1>(ROOT::RVec<Prec>)>() {
+    : queryosity::query::definition<std::shared_ptr<TH1>(ROOT::RVec<Prec>)>() {
   m_hist = HistUtils::makeHist<1, Prec>(xbins);
   m_hist->SetName(name.c_str());
 }
 
 template <typename Prec>
-void Hist<1, ROOT::RVec<Prec>>::fill(ana::observable<ROOT::RVec<Prec>> xs,
-                                     double w) {
+void Hist<1, ROOT::RVec<Prec>>::fill(
+    queryosity::column::observable<ROOT::RVec<Prec>> xs, double w) {
   for (size_t ix = 0; ix < xs->size(); ++ix) {
     m_hist->Fill(xs.value()[ix], w);
   }
@@ -276,17 +282,17 @@ template <typename Prec>
 Hist<2, ROOT::RVec<Prec>>::Hist(const std::string &name,
                                 const std::vector<double> &xbins,
                                 const std::vector<double> &ybins)
-    : ana::counter::definition<std::shared_ptr<TH2>(ROOT::RVec<Prec>,
-                                                    ROOT::RVec<Prec>)>() {
+    : queryosity::query::definition<std::shared_ptr<TH2>(ROOT::RVec<Prec>,
+                                                         ROOT::RVec<Prec>)>() {
   m_hist =
       std::static_pointer_cast<TH2>(HistUtils::makeHist<2, Prec>(xbins, ybins));
   m_hist->SetName(name.c_str());
 }
 
 template <typename Prec>
-void Hist<2, ROOT::RVec<Prec>>::fill(ana::observable<ROOT::RVec<Prec>> xs,
-                                     ana::observable<ROOT::RVec<Prec>> ys,
-                                     double w) {
+void Hist<2, ROOT::RVec<Prec>>::fill(
+    queryosity::column::observable<ROOT::RVec<Prec>> xs,
+    queryosity::column::observable<ROOT::RVec<Prec>> ys, double w) {
   if (xs->size() != ys->size()) {
     throw std::runtime_error("x- and y-arrays do not share the same size");
   }
@@ -316,7 +322,7 @@ Hist<3, ROOT::RVec<Prec>>::Hist(const std::string &name,
                                 const std::vector<double> &xbins,
                                 const std::vector<double> &ybins,
                                 const std::vector<double> &zbins)
-    : ana::counter::definition<std::shared_ptr<TH3>(
+    : queryosity::query::definition<std::shared_ptr<TH3>(
           ROOT::RVec<Prec>, ROOT::RVec<Prec>, ROOT::RVec<Prec>)>() {
   m_hist = std::static_pointer_cast<TH3>(
       HistUtils::makeHist<3, Prec>(xbins, ybins, zbins));
@@ -324,10 +330,10 @@ Hist<3, ROOT::RVec<Prec>>::Hist(const std::string &name,
 }
 
 template <typename Prec>
-void Hist<3, ROOT::RVec<Prec>>::fill(ana::observable<ROOT::RVec<Prec>> xs,
-                                     ana::observable<ROOT::RVec<Prec>> ys,
-                                     ana::observable<ROOT::RVec<Prec>> zs,
-                                     double w) {
+void Hist<3, ROOT::RVec<Prec>>::fill(
+    queryosity::column::observable<ROOT::RVec<Prec>> xs,
+    queryosity::column::observable<ROOT::RVec<Prec>> ys,
+    queryosity::column::observable<ROOT::RVec<Prec>> zs, double w) {
   if (xs->size() != ys->size()) {
     throw std::runtime_error("x- and y-arrays do not share the same size");
   }

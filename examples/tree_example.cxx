@@ -13,7 +13,7 @@
 #include "TVector2.h"
 #include <ROOT/RVec.hxx>
 
-#include "ana/analogical.h"
+#include "queryosity/queryosity.h"
 
 #include "AnalysisPlugins/Folder.h"
 #include "AnalysisPlugins/Hist.h"
@@ -25,15 +25,17 @@ using VecI = ROOT::RVec<int>;
 using VecUI = ROOT::RVec<unsigned int>;
 using P4 = ROOT::Math::PtEtaPhiEVector;
 
-class NthP4 : public ana::column::definition<P4(VecD, VecD, VecD, VecD)> {
+class NthP4
+    : public queryosity::column::definition<P4(VecD, VecD, VecD, VecD)> {
 
 public:
   NthP4(unsigned int index) : m_index(index) {}
   virtual ~NthP4() = default;
 
-  virtual P4 evaluate(ana::observable<VecD> pt, ana::observable<VecD> eta,
-                      ana::observable<VecD> phi,
-                      ana::observable<VecD> es) const override {
+  virtual P4 evaluate(queryosity::column::observable<VecD> pt,
+                      queryosity::column::observable<VecD> eta,
+                      queryosity::column::observable<VecD> phi,
+                      queryosity::column::observable<VecD> es) const override {
     return P4(pt->at(m_index), eta->at(m_index), phi->at(m_index),
               es->at(m_index));
   }
@@ -44,9 +46,9 @@ protected:
 
 int main() {
 
-  ana::multithread::disable();
+  queryosity::multithread::disable();
 
-  ana::dataflow df;
+  queryosity::dataflow df;
 
   auto ds = df.open<Tree>(std::vector<std::string>{"hww.root"}, "mini");
   auto mc_weight = ds.read<float>("mcWeight");
@@ -75,10 +77,11 @@ int main() {
   // auto Escale = df.define([](VecD E){return E;});
   // auto Escale = df.define([](VecD E){return E;}).vary("lp4_up",[](VecD
   // E){return E*1.01;});
-  auto Escale = df.vary(
-      df.define([](VecD E) { return E; }),
-      ana::systematic::variation("lp4_up", [](VecD E) { return E * 1.01; }),
-      ana::systematic::variation("lp4_dn", [](VecD E) { return E * 0.99; }));
+  auto Escale = df.vary(df.define([](VecD E) { return E; }),
+                        queryosity::systematic::variation(
+                            "lp4_up", [](VecD E) { return E * 1.01; }),
+                        queryosity::systematic::variation(
+                            "lp4_dn", [](VecD E) { return E * 0.99; }));
 
   auto lep_pt_sel =
       Escale(lep_pt)[lep_eta < lep_eta_max && lep_eta > (-lep_eta_max)];

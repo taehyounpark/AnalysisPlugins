@@ -4,42 +4,24 @@
 
 RDS::RDS(std::unique_ptr<RDataSource> rds) : m_rds(std::move(rds)) {}
 
-ana::dataset::partition RDS::parallelize() {
-  // force multithreading
-  ROOT::EnableImplicitMT();
-  m_rds->SetNSlots(ROOT::GetThreadPoolSize() ? ROOT::GetThreadPoolSize() : 1);
+void RDS::parallelize(unsigned int nslots) { m_rds->SetNSlots(nslots); }
 
-  // get allocated slots
-  auto slots = m_rds->GetEntryRanges();
-  ana::dataset::partition parts;
-  for (size_t islot = 0; islot < slots.size(); ++islot) {
-    parts.emplace_back(islot, slots[islot].first, slots[islot].second);
-  }
-
-  // use whatever ROOT has decided
-  parts.fixed = true;
-  return parts;
+std::vector<std::pair<unsigned long long, unsigned long long>>
+RDS::partition() {
+  return m_rds->GetEntryRanges();
 }
 
 void RDS::initialize() { m_rds->Initialize(); }
 
 void RDS::finalize() { m_rds->Finalize(); }
 
-std::unique_ptr<RDS::Reader> RDS::open(const ana::dataset::range &) const {
-  return std::make_unique<Reader>(*m_rds);
+void RDS::initialize(unsigned int slot, unsigned long long begin,
+                     unsigned long long /* end */) {
+  m_rds->InitSlot(slot, begin);
 }
 
-RDS::Reader::Reader(RDataSource &rds) : m_rds(&rds) {}
-
-void RDS::Reader::initialize(const ana::dataset::range &part) {
-  m_rds->InitSlot(part.slot, part.begin);
+void RDS::execute(unsigned int slot, unsigned long long entry) {
+  m_rds->SetEntry(slot, entry);
 }
 
-void RDS::Reader::execute(const ana::dataset::range &part,
-                          unsigned long long entry) {
-  m_rds->SetEntry(part.slot, entry);
-}
-
-void RDS::Reader::finalize(const ana::dataset::range &part) {
-  m_rds->FinalizeSlot(part.slot);
-}
+void RDS::finalize(unsigned int slot) { m_rds->FinalizeSlot(slot); }

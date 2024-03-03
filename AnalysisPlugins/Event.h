@@ -14,9 +14,9 @@
 #include "xAODRootAccess/TEvent.h"
 #include "xAODRootAccess/TStore.h"
 
-#include "ana/analogical.h"
+#include "queryosity/queryosity.h"
 
-class Event : public ana::dataset::source<Event> {
+class Event : public queryosity::dataset::reader<Event> {
 
 public:
   class Loop;
@@ -29,13 +29,13 @@ public:
         const std::string &metadata = "MetaData");
   ~Event() = default;
 
-  ana::dataset::partition parallelize();
+  queryosity::dataset::partition parallelize();
   double normalize();
 
-  std::unique_ptr<Loop> read(const ana::dataset::range &part) const;
+  std::unique_ptr<Loop> read(unsigned int) const;
 
   template <typename U>
-  std::unique_ptr<Container<U>> read(const ana::dataset::range &part,
+  std::unique_ptr<Container<U>> read(unsigned int,
                                      const std::string &name) const;
 
 protected:
@@ -46,15 +46,15 @@ protected:
   std::vector<std::string> m_goodFiles;
 };
 
-class Event::Loop : public ana::dataset::player {
+class Event::Loop : public queryosity::dataset::player {
 public:
   Loop(TTree *tree);
   ~Loop() = default;
 
-  virtual void start(const ana::dataset::range &part) override;
-  virtual void next(const ana::dataset::range &part,
+  virtual void start(const queryosity::dataset::range &part) override;
+  virtual void next(const queryosity::dataset::range &part,
                     unsigned long long entry) override;
-  virtual void finish(const ana::dataset::range &part) override;
+  virtual void finish(const queryosity::dataset::range &part) override;
 
 protected:
   std::unique_ptr<xAOD::TEvent> m_event;
@@ -62,15 +62,15 @@ protected:
   long long m_end;
 };
 
-template <typename T> class Event::Container : public ana::dataset::reader<T> {
+template <typename T>
+class Event::Container : public queryosity::column::reader<T> {
 
 public:
   Container(const std::string &containerName, xAOD::TEvent &event)
       : m_containerName(containerName), m_event(&event) {}
   ~Container() = default;
 
-  virtual T const &read(const ana::dataset::range &part,
-                        unsigned long long entry) const override {
+  virtual T const &read(unsigned int, unsigned long long entry) const override {
     T const *container(nullptr);
     if (m_event->retrieve(container, this->m_containerName.c_str())
             .isFailure()) {
@@ -87,7 +87,7 @@ protected:
 
 template <typename U>
 std::unique_ptr<Event::Container<U>>
-Event::Loop::read(const ana::dataset::range &,
+Event::Loop::read(const queryosity::dataset::range &,
                   const std::string &containerName) const {
   return std::make_unique<Container<U>>(containerName, *m_event);
 }

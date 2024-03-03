@@ -5,25 +5,41 @@
 #include "TTreeReaderArray.h"
 #include "TTreeReaderValue.h"
 
-Tree::Tree(const std::vector<std::string> &allFiles,
+Tree::Tree(const std::vector<std::string> &inputFiles,
            const std::string &treeName)
-    : m_allFiles(allFiles), m_treeName(treeName) {}
+    : m_inputFiles(inputFiles), m_treeName(treeName) {}
 
-Tree::Tree(std::initializer_list<std::string> allFiles,
+Tree::Tree(std::initializer_list<std::string> inputFiles,
            const std::string &treeName)
-    : m_allFiles(allFiles), m_treeName(treeName) {}
+    : m_inputFiles(inputFiles), m_treeName(treeName) {}
 
-ana::dataset::partition Tree::parallelize() {
+void Tree::parallelize(unsigned int nslots) {
+  m_trees.resize(nslots);
+  m_treeReaders.resize(nslots);
+  for (unsigned int islot = 0; islot < nslots; ++islot) {
+    auto tree =
+        std::make_unique<TChain>(m_treeName.c_str(), m_treeName.c_str());
+    tree->ResetBit(kMustCleanup);
+    for (auto const &filePath : m_inputFiles) {
+      tree->Add(filePath.c_str());
+    }
+    auto treeReader = std::make_unique<TTreeReader>(tree.get());
+    m_trees[islot] = std::move(tree);
+    m_treeReaders[islot] = std::move(treeReader);
+  }
+}
+
+std::vector<std::pair<unsigned long long, unsigned long long>>
+Tree::partition() {
   ROOT::EnableThreadSafety();
   ROOT::EnableImplicitMT();
 
   TDirectory::TContext c;
-  ana::dataset::partition parts;
+  std::vector<std::pair<unsigned long long, unsigned long long>> parts;
 
   // offset to account for global entry position
   long long offset = 0ll;
-  size_t islot = 0;
-  for (const auto &filePath : m_allFiles) {
+  for (const auto &filePath : m_inputFiles) {
     // check file
     std::unique_ptr<TFile> file(TFile::Open(filePath.c_str()));
     if (!file) {
@@ -38,51 +54,30 @@ ana::dataset::partition Tree::parallelize() {
       continue;
     }
 
-    // tree good
-    m_goodFiles.push_back(filePath);
-
     // add tree clusters
     auto fileEntries = tree->GetEntries();
     auto clusterIterator = tree->GetClusterIterator(0);
     long long start = 0ll, end = 0ll;
     while ((start = clusterIterator.Next()) < fileEntries) {
       end = clusterIterator.GetNextEntry();
-      parts.emplace_back(islot++, offset + start, offset + end);
+      parts.emplace_back(offset + start, offset + end);
     }
     // remember offset for next file
     offset += fileEntries;
   }
 
-  // allocate slots
-  m_trees.resize(parts.size());
-  m_treeReaders.resize(parts.size());
-
   return parts;
 }
 
-std::unique_ptr<Tree::Reader> Tree::open(const ana::dataset::range &part) {
-  auto tree = std::make_unique<TChain>(m_treeName.c_str(), m_treeName.c_str());
-  tree->ResetBit(kMustCleanup);
-  for (auto const &filePath : m_goodFiles) {
-    tree->Add(filePath.c_str());
-  }
-  auto treeReader = std::make_unique<TTreeReader>(tree.get());
-  m_trees[part.slot] = std::move(tree);
-  m_treeReaders[part.slot] = std::move(treeReader);
-  return std::make_unique<Reader>(*m_treeReaders[part.slot]);
+void Tree::initialize(unsigned int slot, unsigned long long begin,
+                      unsigned long long end) {
+  m_treeReaders[slot]->SetEntriesRange(begin, end);
 }
 
-Tree::Reader::Reader(TTreeReader &treeReader) : m_treeReader(&treeReader) {}
-
-void Tree::Reader::initialize(const ana::dataset::range &part) {
-  m_treeReader->SetEntriesRange(part.begin, part.end);
+void Tree::execute(unsigned int slot, unsigned long long entry) {
+  m_treeReaders[slot]->SetEntry(entry);
 }
 
-void Tree::Reader::execute(const ana::dataset::range &,
-                           unsigned long long entry) {
-  m_treeReader->SetEntry(entry);
-}
-
-void Tree::Reader::finalize(const ana::dataset::range &) {
-  // nothing to do
+void Tree::finalize(unsigned int) {
+  // m_treeReaders[slot].reset(nullptr);
 }

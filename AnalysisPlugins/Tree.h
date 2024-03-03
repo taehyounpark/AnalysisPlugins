@@ -15,9 +15,9 @@
 #include "TTreeReaderArray.h"
 #include "TTreeReaderValue.h"
 
-#include "ana/analogical.h"
+#include "queryosity/queryosity.h"
 
-class Tree : public ana::dataset::source<Tree> {
+class Tree : public queryosity::dataset::reader<Tree> {
 
 public:
   class Reader;
@@ -30,43 +30,32 @@ public:
   Tree(const std::vector<std::string> &filePaths, const std::string &treeName);
   Tree(std::initializer_list<std::string> filePaths,
        const std::string &treeName);
-  // ~Tree() = default;
+  ~Tree() = default;
 
-  // Tree(Tree &&) = default;
-  // Tree &operator=(Tree &&) = default;
+  virtual void parallelize(unsigned int nslots) override;
 
-  virtual ana::dataset::partition parallelize() override;
-
-  std::unique_ptr<Reader> open(const ana::dataset::range &part);
+  virtual std::vector<std::pair<unsigned long long, unsigned long long>>
+  partition() override;
 
   template <typename U>
-  std::unique_ptr<Branch<U>> read(const ana::dataset::range &,
+  std::unique_ptr<Branch<U>> read(unsigned int slot,
                                   const std::string &branchName);
 
+  virtual void initialize(unsigned int slot, unsigned long long begin,
+                          unsigned long long end) override;
+  virtual void execute(unsigned int slot, unsigned long long entry) override;
+  virtual void finalize(unsigned int slot) override;
+
 protected:
-  std::vector<std::string> m_allFiles;
-  std::vector<std::string> m_goodFiles;
+  std::vector<std::string> m_inputFiles;
   std::string m_treeName;
 
   std::vector<std::unique_ptr<TTree>> m_trees;             //!
   std::vector<std::unique_ptr<TTreeReader>> m_treeReaders; //!
 };
 
-class Tree::Reader : public ana::dataset::player {
-public:
-  Reader(TTreeReader &treeReader);
-  ~Reader() = default;
-
-  virtual void initialize(const ana::dataset::range &part) override;
-  virtual void execute(const ana::dataset::range &part,
-                       unsigned long long entry) override;
-  virtual void finalize(const ana::dataset::range &part) override;
-
-protected:
-  TTreeReader *const m_treeReader;
-};
-
-template <typename T> class Tree::Branch : public ana::dataset::reader<T> {
+template <typename T>
+class Tree::Branch : public queryosity::column::reader<T> {
 
 public:
   Branch(const std::string &branchName, TTreeReader &treeReader)
@@ -76,8 +65,7 @@ public:
   }
   ~Branch() = default;
 
-  virtual T const &read(const ana::dataset::range &,
-                        unsigned long long) const override {
+  virtual T const &read(unsigned int, unsigned long long) const override {
     return **m_treeReaderValue;
   }
 
@@ -87,7 +75,8 @@ protected:
 };
 
 template <typename T>
-class Tree::Branch<ROOT::RVec<T>> : public ana::dataset::reader<ROOT::RVec<T>> {
+class Tree::Branch<ROOT::RVec<T>>
+    : public queryosity::column::reader<ROOT::RVec<T>> {
 
 public:
   Branch(const std::string &branchName, TTreeReader &treeReader)
@@ -97,9 +86,10 @@ public:
   }
   ~Branch() = default;
 
-  virtual void initialize(const ana::dataset::range &) override {}
+  virtual void initialize(unsigned int, unsigned long long,
+                          unsigned long long) override {}
 
-  virtual ROOT::RVec<T> const &read(const ana::dataset::range &,
+  virtual ROOT::RVec<T> const &read(unsigned int,
                                     unsigned long long) const override {
     if (auto arraySize = m_treeReaderArray->GetSize()) {
       ROOT::RVec<T> readArray(&m_treeReaderArray->At(0), arraySize);
@@ -119,7 +109,7 @@ protected:
 
 template <>
 class Tree::Branch<ROOT::RVec<bool>>
-    : public ana::dataset::reader<ROOT::RVec<bool>> {
+    : public queryosity::column::reader<ROOT::RVec<bool>> {
 
 public:
   Branch(const std::string &branchName, TTreeReader &treeReader)
@@ -129,7 +119,7 @@ public:
   }
   ~Branch() = default;
 
-  virtual ROOT::RVec<bool> const &read(const ana::dataset::range &,
+  virtual ROOT::RVec<bool> const &read(unsigned int,
                                        unsigned long long) const override {
     if (m_treeReaderArray->GetSize()) {
       ROOT::RVec<bool> readArray(m_treeReaderArray->begin(),
@@ -150,7 +140,8 @@ protected:
 
 template <typename... ColumnTypes>
 class Tree::Snapshot
-    : public ana::counter::definition<std::shared_ptr<TTree>(ColumnTypes...)> {
+    : public queryosity::query::definition<std::shared_ptr<TTree>(
+          ColumnTypes...)> {
 
 public:
   static constexpr size_t N = sizeof...(ColumnTypes);
@@ -162,7 +153,8 @@ public:
   Snapshot(const std::string &treeName, Names const &...columnNames);
   virtual ~Snapshot() = default;
 
-  virtual void fill(ana::observable<ColumnTypes>..., double) override;
+  virtual void fill(queryosity::column::observable<ColumnTypes>...,
+                    double) override;
   virtual std::shared_ptr<TTree> result() const override;
   virtual std::shared_ptr<TTree>
   merge(std::vector<std::shared_ptr<TTree>> const &results) const override;
@@ -175,7 +167,7 @@ private:
   }
 
   template <std::size_t I, typename T>
-  void fillBranch(const ana::observable<T> &column) {
+  void fillBranch(const queryosity::column::observable<T> &column) {
     std::get<I>(m_columns) = column.value();
   }
 
@@ -198,9 +190,9 @@ protected:
 };
 
 template <typename U>
-std::unique_ptr<Tree::Branch<U>> Tree::read(const ana::dataset::range &part,
+std::unique_ptr<Tree::Branch<U>> Tree::read(unsigned int slot,
                                             const std::string &branchName) {
-  return std::make_unique<Branch<U>>(branchName, *m_treeReaders[part.slot]);
+  return std::make_unique<Branch<U>>(branchName, *m_treeReaders[slot]);
 }
 
 template <typename... ColumnTypes>
@@ -215,7 +207,7 @@ Tree::Snapshot<ColumnTypes...>::Snapshot(const std::string &treeName,
 
 template <typename... ColumnTypes>
 void Tree::Snapshot<ColumnTypes...>::fill(
-    ana::observable<ColumnTypes>... columns, double) {
+    queryosity::column::observable<ColumnTypes>... columns, double) {
   this->fillBranchs(std::index_sequence_for<ColumnTypes...>(), columns...);
   m_snapshot->Fill();
 }

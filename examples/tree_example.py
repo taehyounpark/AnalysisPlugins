@@ -13,4 +13,4 @@ test = df.define['std::function<float(float)>'](ROOT.test_fn)
 print(test)
 
 import cppyy
-cppyy.load_library('/home/thpark/ana/analogical-benchmarks/build/AnalysisPlugins/libAnalysisPlugins.so')
+cppyy.load_library('/home/thpark/ana/queryosity-benchmarks/build/AnalysisPlugins/libAnalysisPlugins.so')

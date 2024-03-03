@@ -17,10 +17,10 @@ double Event::normalize() {
   return 1.0; // can (should?) normalize xAOD::CutBookkeeper sumOfWeights
 }
 
-ana::dataset::partition Event::parallelize() {
+queryosity::dataset::partition Event::parallelize() {
   TDirectory::TContext c;
 
-  ana::dataset::partition parts;
+  queryosity::dataset::partition parts;
   unsigned int ipart = 0;
   long long offset = 0;
 
@@ -53,7 +53,8 @@ ana::dataset::partition Event::parallelize() {
   return parts;
 }
 
-std::unique_ptr<Event::Loop> Event::read(const ana::dataset::range &) const {
+std::unique_ptr<Event::Loop>
+Event::read(const queryosity::dataset::range &) const {
   auto tree = std::make_unique<TChain>(m_treeName.c_str(), m_treeName.c_str());
   for (auto const &filePath : m_goodFiles) {
     tree->Add(filePath.c_str());
@@ -69,16 +70,17 @@ Event::Loop::Loop(TTree *tree) {
   };
 }
 
-void Event::Loop::start(const ana::dataset::range &) {
+void Event::Loop::start(const queryosity::dataset::range &) {
   // nothing to do
 }
 
-void Event::Loop::next(const ana::dataset::range &, unsigned long long entry) {
+void Event::Loop::next(const queryosity::dataset::range &,
+                       unsigned long long entry) {
   if (m_event->getEntry(entry) < 0) {
     throw std::runtime_error("failed to get entry");
   }
 }
 
-void Event::Loop::finish(const ana::dataset::range &) {
+void Event::Loop::finish(const queryosity::dataset::range &) {
   // nothing to do
 }

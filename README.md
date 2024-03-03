@@ -22,11 +22,11 @@ mkdir -p AnalysisFramework/ && cd AnalysisFramework/
 asetup AnalysisBase,22.2.110,here
 
 # clone repositories
-git clone https://github.com/taehyounpark/analogical.git
+git clone https://github.com/taehyounpark/queryosity.git
 git clone https://github.com/taehyounpark/AnalysisPlugins.git
 
 # delete CMakeLists.txt problematic for AnalysisBase environment
-rm analogical/tests/CMakeLists.txt
+rm queryosity/tests/CMakeLists.txt
 
 # configure build & compile
 cd ../ && mkdir -p build/ && cd build/
