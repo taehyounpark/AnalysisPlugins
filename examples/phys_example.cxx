@@ -76,7 +76,7 @@ int main() {
   })(eventInfo);
   auto mcEventWeighted = df.filter<weight>("mcEventWeight")(mcEventWeight);
 
-  auto selMuonsPtHist = df.agg<Hist<1, VecF>>("muons_pt", 100, 0, 100)
+  auto selMuonsPtHist = df.get<Hist<1, VecF>>("muons_pt", 100, 0, 100)
                             .fill(selMuonsPt)
                             .at(mcEventWeighted);
 
