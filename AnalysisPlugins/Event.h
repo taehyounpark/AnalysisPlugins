@@ -19,8 +19,6 @@
 class Event : public queryosity::dataset::reader<Event> {
 
 public:
-  class Loop;
-
   template <typename T> class Container;
 
 public:
@@ -29,13 +27,14 @@ public:
         const std::string &metadata = "MetaData");
   ~Event() = default;
 
-  queryosity::dataset::partition parallelize();
-  double normalize();
-
-  std::unique_ptr<Loop> read(unsigned int) const;
+  virtual void parallelize(unsigned int) override;
+  virtual std::vector<std::pair<unsigned long long, unsigned long long>> partition() override;
+  virtual void initialize(unsigned int, unsigned long long, unsigned long long) override;
+  virtual void execute(unsigned int, unsigned long long) override;
+  virtual void finalize(unsigned int) override;
 
   template <typename U>
-  std::unique_ptr<Container<U>> read(unsigned int,
+  std::unique_ptr<Container<U>> read(unsigned int slot,
                                      const std::string &name) const;
 
 protected:
@@ -43,23 +42,7 @@ protected:
   std::string m_treeName;
   std::string m_metaName;
 
-  std::vector<std::string> m_goodFiles;
-};
-
-class Event::Loop : public queryosity::dataset::player {
-public:
-  Loop(TTree *tree);
-  ~Loop() = default;
-
-  virtual void start(const queryosity::dataset::range &part) override;
-  virtual void next(const queryosity::dataset::range &part,
-                    unsigned long long entry) override;
-  virtual void finish(const queryosity::dataset::range &part) override;
-
-protected:
-  std::unique_ptr<xAOD::TEvent> m_event;
-  long long m_current;
-  long long m_end;
+  std::vector<std::unique_ptr<xAOD::TEvent>> m_tevents;
 };
 
 template <typename T>
@@ -87,7 +70,7 @@ protected:
 
 template <typename U>
 std::unique_ptr<Event::Container<U>>
-Event::Loop::read(const queryosity::dataset::range &,
+Event::read(unsigned int slot,
                   const std::string &containerName) const {
-  return std::make_unique<Container<U>>(containerName, *m_event);
+  return std::make_unique<Container<U>>(containerName, *m_tevents[slot]);
 }

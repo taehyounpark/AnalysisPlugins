@@ -13,18 +13,29 @@ Event::Event(const std::vector<std::string> &inputFiles,
   xAOD::Init().ignore();
 }
 
-double Event::normalize() {
-  return 1.0; // can (should?) normalize xAOD::CutBookkeeper sumOfWeights
+void Event::parallelize(unsigned int nslots) {
+  m_tevents.resize(nslots);
+  for (unsigned int islot = 0; islot < nslots; ++islot) {
+    auto tree = std::make_unique<TChain>(m_treeName.c_str(), m_treeName.c_str());
+    for (auto const &filePath : m_inputFiles) {
+      tree->Add(filePath.c_str());
+    }
+    tree->ResetBit(kMustCleanup);
+    auto tevent = std::make_unique<xAOD::TEvent>();
+    if (tevent->readFrom(tree.release()).isFailure()) {
+      throw std::runtime_error("failed to read event");
+    };
+    m_tevents[islot] = std::move(tevent);
+  }
 }
 
-queryosity::dataset::partition Event::parallelize() {
+std::vector<std::pair<unsigned long long, unsigned long long>> Event::partition() {
   TDirectory::TContext c;
 
-  queryosity::dataset::partition parts;
-  unsigned int ipart = 0;
-  long long offset = 0;
-
+  std::vector<std::pair<unsigned long long, unsigned long long>> parts;
+  
   // check all files for tree clusters
+  long long offset = 0;
   for (const auto &filePath : m_inputFiles) {
 
     // check file
@@ -45,42 +56,23 @@ queryosity::dataset::partition Event::parallelize() {
     // get file entries
     long long fileEntries = event->getEntries();
     // add part to parts
-    m_goodFiles.push_back(filePath);
-    parts.add_part(ipart++, offset, offset + fileEntries);
+    parts.emplace_back(offset, offset + fileEntries);
     offset += fileEntries;
   }
 
   return parts;
 }
 
-std::unique_ptr<Event::Loop>
-Event::read(const queryosity::dataset::range &) const {
-  auto tree = std::make_unique<TChain>(m_treeName.c_str(), m_treeName.c_str());
-  for (auto const &filePath : m_goodFiles) {
-    tree->Add(filePath.c_str());
-  }
-  tree->ResetBit(kMustCleanup);
-  return std::make_unique<Loop>(tree.release());
-}
-
-Event::Loop::Loop(TTree *tree) {
-  m_event = std::make_unique<xAOD::TEvent>();
-  if (m_event->readFrom(tree).isFailure()) {
-    throw std::runtime_error("failed to read event");
-  };
-}
-
-void Event::Loop::start(const queryosity::dataset::range &) {
+void Event::initialize(unsigned int, unsigned long long, unsigned long long) {
   // nothing to do
 }
 
-void Event::Loop::next(const queryosity::dataset::range &,
-                       unsigned long long entry) {
-  if (m_event->getEntry(entry) < 0) {
+void Event::execute(unsigned int slot, unsigned long long entry) {
+  if (m_tevents[slot]->getEntry(entry) < 0) {
     throw std::runtime_error("failed to get entry");
   }
 }
 
-void Event::Loop::finish(const queryosity::dataset::range &) {
+void Event::finalize(unsigned int) {
   // nothing to do
 }
