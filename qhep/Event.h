@@ -53,7 +53,7 @@ public:
       : m_containerName(containerName), m_event(&event) {}
   ~Container() = default;
 
-  virtual T const &read(unsigned int, unsigned long long entry) const override {
+  virtual T const &read(unsigned int, unsigned long long) const override {
     T const *container(nullptr);
     if (m_event->retrieve(container, this->m_containerName.c_str())
             .isFailure()) {

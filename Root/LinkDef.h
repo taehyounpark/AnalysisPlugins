@@ -11,8 +11,6 @@
 #pragma link off all classes;
 #pragma link off all globals;
 
-#pragma link C++ class queryosity::dataflow + ;
-
 #pragma link C++ class Hist < 1, float> + ;
 #pragma link C++ class Hist < 2, float> + ;
 #pragma link C++ class Hist < 3, float> + ;
@@ -23,6 +21,12 @@
 #pragma link C++ class Tree + ;
 #pragma link C++ class RDS + ;
 #pragma link C++ class Event + ;
+
+#pragma link C++ class queryosity::dataflow;
+#pragma link C++ class queryosity::dataset::input<Tree>;
+#pragma link C++ class queryosity::dataset::loaded<Tree>;
+#pragma link C++ class queryosity::dataset::column<float>;
+#pragma link C++ class queryosity::column::expression<std::function<int(int)>>;
 
 #pragma link C++ nestedclass;
 #pragma link C++ nestedtypedef;
