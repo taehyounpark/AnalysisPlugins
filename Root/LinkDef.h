@@ -1,9 +1,9 @@
 #include "queryosity/queryosity.h"
 
-#include "AnalysisPlugins/RDS.h"
-#include "AnalysisPlugins/Tree.h"
+#include "qhep/RDS.h"
+#include "qhep/Tree.h"
 
-#include "AnalysisPlugins/Hist.h"
+#include "qhep/Hist.h"
 
 #ifdef __CINT__
 

@@ -1,0 +1,13 @@
+<lcgdict>
+
+  <!-- This file contains a list of all classes for which a dictionary
+       should be created. -->
+
+  <class name="queryosity::dataflow" />
+
+  <class name="RDS" />
+  <class name="Event" />
+  <class name="Tree" />
+  <class name="Hist<1,float>" />
+   
+</lcgdict>

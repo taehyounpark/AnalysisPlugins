@@ -15,9 +15,9 @@
 
 #include "queryosity/queryosity.h"
 
-#include "AnalysisPlugins/Folder.h"
-#include "AnalysisPlugins/Hist.h"
-#include "AnalysisPlugins/Tree.h"
+#include "qhep/Folder.h"
+#include "qhep/Hist.h"
+#include "qhep/Tree.h"
 
 using VecF = ROOT::RVec<float>;
 using VecD = ROOT::RVec<double>;

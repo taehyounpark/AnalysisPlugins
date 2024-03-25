@@ -1,4 +1,4 @@
-#include "AnalysisPlugins/Tree.h"
+#include "qhep/Tree.h"
 
 #include "TROOT.h"
 #include "TTreeReader.h"

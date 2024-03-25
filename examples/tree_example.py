@@ -1,10 +1,13 @@
 import ROOT
-from ROOT import ana
+from ROOT import queryosity as qty
 
-df = ana.dataflow['Tree'](['hww.root'],'mini')
-print(df)
+df = qty.dataflow()
 
-mc_weight = df.read['float']('mcWeight')
+ds = df.load( qty.dataset.input['Tree'](['hww.root'], 'mini') )
+
+print(df,ds)
+
+mc_weight = ds.read( qty.dataset.column['float']('mcWeight') )
 print(mc_weight)
 
 test_fn = ROOT.gInterpreter.Declare('''auto test_fn = std::function([](float x){return x;});''')
@@ -13,4 +16,4 @@ test = df.define['std::function<float(float)>'](ROOT.test_fn)
 print(test)
 
 import cppyy
-cppyy.load_library('/home/thpark/ana/queryosity-benchmarks/build/AnalysisPlugins/libAnalysisPlugins.so')
+cppyy.load_library('/home/thpark/ana/queryosity-benchmarks/build/qhep/libqhep.so')

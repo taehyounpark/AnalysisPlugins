@@ -137,7 +137,7 @@ protected:
   std::shared_ptr<TH3> m_hist; //!
 };
 
-#include "AnalysisPlugins/HistUtils.h"
+#include "qhep/HistUtils.h"
 
 template <typename Prec>
 Hist<1, Prec>::Hist(const std::string &name, unsigned int nbins, double xmin,

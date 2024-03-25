@@ -1,8 +1,10 @@
-#include "AnalysisPlugins/RDS.h"
+#include "qhep/RDS.h"
 
 #include "TROOT.h"
 
-RDS::RDS(std::unique_ptr<RDataSource> rds) : m_rds(std::move(rds)) {}
+RDS::RDS(std::unique_ptr<RDataSource> rds) : m_rds(std::move(rds)) {
+  ROOT::EnableThreadSafety();
+}
 
 void RDS::parallelize(unsigned int nslots) { m_rds->SetNSlots(nslots); }
 

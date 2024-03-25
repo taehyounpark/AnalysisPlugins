@@ -1,4 +1,4 @@
-# AnalysisPlugins
+# qhep
 
 ## Features
 
@@ -23,7 +23,7 @@ asetup AnalysisBase,22.2.110,here
 
 # clone repositories
 git clone https://github.com/taehyounpark/queryosity.git
-git clone https://github.com/taehyounpark/AnalysisPlugins.git
+git clone https://github.com/taehyounpark/qhep.git
 
 # delete CMakeLists.txt problematic for AnalysisBase environment
 rm queryosity/tests/CMakeLists.txt

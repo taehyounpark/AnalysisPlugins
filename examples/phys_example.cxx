@@ -1,5 +1,5 @@
-#include "AnalysisPlugins/Event.h"
-#include "AnalysisPlugins/Hist.h"
+#include "qhep/Event.h"
+#include "qhep/Hist.h"
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODMuon/MuonContainer.h>
