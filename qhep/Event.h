@@ -32,6 +32,8 @@ public:
   virtual void initialize(unsigned int, unsigned long long, unsigned long long) override;
   virtual void execute(unsigned int, unsigned long long) override;
   virtual void finalize(unsigned int) override;
+  using queryosity::dataset::source::initialize;
+  using queryosity::dataset::source::finalize;
 
   template <typename U>
   std::unique_ptr<Container<U>> read(unsigned int slot,

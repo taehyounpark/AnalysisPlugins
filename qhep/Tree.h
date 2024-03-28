@@ -45,6 +45,8 @@ public:
                           unsigned long long end) override;
   virtual void execute(unsigned int slot, unsigned long long entry) override;
   virtual void finalize(unsigned int slot) override;
+  using queryosity::dataset::source::initialize;
+  using queryosity::dataset::source::finalize;
 
 protected:
   std::vector<std::string> m_inputFiles;

@@ -14,7 +14,8 @@ atlas_add_library( qhepLib
   qhep/*.h Root/*.cxx ${qhepDictSource}
   PUBLIC_HEADERS qhep
   INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
-  LINK_LIBRARIES ${ROOT_LIBRARIES} EventLoop xAODBase xAODRootAccess xAODCutFlow xAODMuon xAODEventInfo queryosity::queryosity )
+  LINK_LIBRARIES ${ROOT_LIBRARIES} EventLoop xAODBase xAODRootAccess xAODCutFlow xAODEventInfo xAODTau xAODJet xAODMuon xAODEgamma
+  xAODTracking xAODTruth queryosity::queryosity )
 
 # atlas_add_dictionary (qhepDict
 #   qhep/qhepDict.h
