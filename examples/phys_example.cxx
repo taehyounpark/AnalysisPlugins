@@ -70,8 +70,8 @@ protected:
   double m_eta_max;
 };
 
-bool AtLeastTwoElectrons(ConstDataVector<xAOD::ElectronContainer> const &els) {
-  return els.size() >= 2;
+bool TwoElectrons(ConstDataVector<xAOD::ElectronContainer> const &els) {
+  return els.size() == 2;
 }
 
 float DiElectronsMass(ConstDataVector<xAOD::ElectronContainer> const &els) {
@@ -96,7 +96,7 @@ void analyze(unsigned int n) {
   auto eventWeight = df.define(column::expression(EventWeight), eventInfo);
   auto atLeastTwoSelectedElectrons =
       df.weight(eventWeight)
-          .filter(column::expression(AtLeastTwoElectrons), selectedElectrons);
+          .filter(column::expression(TwoElectrons), selectedElectrons);
 
   auto selectedElectronsPtHist =
       df.make(query::plan<Hist<1,float>>("diElectronMass", 100, 0, 500))
