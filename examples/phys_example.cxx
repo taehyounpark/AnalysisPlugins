@@ -105,7 +105,7 @@ void analyze(unsigned int n) {
 
   selectedElectronsPtHist->Draw();
   gPad->SetLogy();
-  gPad->Print("el_pts.pdf");
+  gPad->Print("mee.pdf");
 }
 
 int main(int argc, char *argv[]) { 
